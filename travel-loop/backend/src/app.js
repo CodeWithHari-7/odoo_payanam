@@ -15,8 +15,12 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Traveloop API is running.' });
 });
 
-// We will mount our routes here in later phases
+const authRoutes = require('./routes/authRoutes');
+const locationRoutes = require('./routes/locationRoutes');
 
+// Mount routes
+app.use('/api/auth', authRoutes);
+app.use('/api/locations', locationRoutes);
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
