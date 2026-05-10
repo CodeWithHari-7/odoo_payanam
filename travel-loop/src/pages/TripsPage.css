@@ -140,6 +140,28 @@
   cursor: not-allowed;
 }
 
+.btn-create-trip {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.8rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-create-trip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+}
+
 .btn-select-dest {
   width: 100%;
   margin-top: 1.5rem;
@@ -171,7 +193,7 @@
 
 .location-inputs {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
 }
 
@@ -189,6 +211,8 @@
 }
 
 .loc-input-group input {
+  width: 100%;
+  box-sizing: border-box;
   padding: 1rem;
   border-radius: 12px;
   border: 1px solid #cbd5e1;
@@ -358,7 +382,7 @@
 .activity-list::before {
   content: '';
   position: absolute;
-  top: 10px; bottom: 10px; left: 95px;
+  top: 10px; bottom: 10px; left: 111px;
   width: 2px;
   background: #e2e8f0;
   z-index: 0;

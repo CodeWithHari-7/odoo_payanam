@@ -1,0 +1,105 @@
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const prisma = new PrismaClient();
+
+// Generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+};
+
+// @desc    Register new user
+// @route   POST /api/auth/register
+// @access  Public
+const registerUser = async (req, res, next) => {
+  try {
+    const { name, email, password, phone } = req.body;
+
+    if (!name || !email || !password) {
+      res.status(400);
+      throw new Error('Please add all required fields');
+    }
+
+    // Check if user exists
+    const userExists = await prisma.user.findUnique({ where: { email } });
+    if (userExists) {
+      res.status(400);
+      throw new Error('User already exists');
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        phone
+      }
+    });
+
+    if (user) {
+      res.status(201).json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user.id)
+      });
+    } else {
+      res.status(400);
+      throw new Error('Invalid user data');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Authenticate a user
+// @route   POST /api/auth/login
+// @access  Public
+const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user.id)
+      });
+    } else {
+      res.status(401);
+      throw new Error('Invalid email or password');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get user data
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = async (req, res, next) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getMe,
+};

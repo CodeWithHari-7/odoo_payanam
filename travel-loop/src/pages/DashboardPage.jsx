@@ -7,7 +7,12 @@ import {
   Compass, CreditCard, ChevronRight, Share2, 
   Navigation, Clock, MoreHorizontal
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import './DashboardPage.css';
+
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+const genAI = new GoogleGenerativeAI(apiKey);
 
 const expenseData = [
   { name: 'Flights', value: 400, color: '#38BDF8' },
@@ -40,6 +45,7 @@ const heroImages = [
 ];
 
 function DashboardPage() {
+  const { t } = useLanguage();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [query, setQuery] = useState('');
   const [places, setPlaces] = useState([]);
@@ -57,7 +63,66 @@ function DashboardPage() {
     } catch(e) {}
     return null;
   });
+  const [tripData, setTripData] = useState(() => {
+    try {
+      const data = localStorage.getItem('savedTripData');
+      if (data) return JSON.parse(data);
+    } catch(e) {}
+    return null;
+  });
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isGeneratingTimeline, setIsGeneratingTimeline] = useState(false);
+
+  const generateDashboardItinerary = async (locationName) => {
+    setIsGeneratingTimeline(true);
+    try {
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash-latest",
+        generationConfig: { responseMimeType: "application/json" }
+      }, { apiVersion: 'v1' });
+
+      const prompt = `
+        You are an expert travel planner. Create a premium 1-day quick itinerary for a trip to: ${locationName}. 
+        Calculate a realistic estimated budget for this specific trip in Indian Rupees (₹).
+        Return EXACTLY a JSON object in this structure:
+        {
+          "days": [
+            {
+              "title": "Day 1",
+              "activities": [
+                { "time": "09:00 AM", "title": "[Activity]", "desc": "[Short desc]" },
+                { "time": "02:00 PM", "title": "[Activity]", "desc": "[Short desc]" },
+                { "time": "07:30 PM", "title": "[Activity]", "desc": "[Short desc]" }
+              ]
+            }
+          ],
+          "budget": {
+            "total": [Realistic total integer cost in INR],
+            "breakdown": [
+              { "name": "Flights", "value": [Realistic integer cost] },
+              { "name": "Hotels", "value": [Realistic integer cost] },
+              { "name": "Food", "value": [Realistic integer cost] },
+              { "name": "Activities", "value": [Realistic integer cost] }
+            ]
+          }
+        }
+      `;
+
+      const result = await model.generateContent(prompt);
+      const parsedData = JSON.parse(result.response.text());
+      setTripData(parsedData);
+    } catch (err) {
+      console.error("Gemini Gen Error:", err);
+    } finally {
+      setIsGeneratingTimeline(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!tripData) {
+      generateDashboardItinerary(selectedPlace ? selectedPlace.fullName : 'Oahu, Hawaii');
+    }
+  }, []);
 
   useEffect(() => {
     if (query.length < 2) {
@@ -112,6 +177,8 @@ function DashboardPage() {
     } catch(e) {
       console.error("Error saving history", e);
     }
+    
+    generateDashboardItinerary(place.place_name);
   };
 
   useEffect(() => {
@@ -211,10 +278,10 @@ function DashboardPage() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <button className="btn-cinematic btn-secondary-cine">
-              <Share2 size={18} /> Share Trip
+              <Share2 size={18} /> {t('shareTrip')}
             </button>
             <Link to="/trips" className="btn-cinematic btn-primary-cine" style={{textDecoration: 'none'}}>
-              <Navigation size={18} /> Open Itinerary
+              <Navigation size={18} /> {t('openItinerary')}
             </Link>
           </motion.div>
         </div>
@@ -230,9 +297,8 @@ function DashboardPage() {
           <section className="quick-stats">
             {[
               { title: 'Trips Created', value: '4', icon: <Compass />, colorClass: 'icon-blue' },
-              { title: 'Budget Remaining', value: '$1,240', icon: <CreditCard />, colorClass: 'icon-teal' },
               { title: 'Countries Visiting', value: '2', icon: <MapPin />, colorClass: 'icon-purple' },
-              { title: 'Upcoming Activities', value: '12', icon: <Activity />, colorClass: 'icon-pink' }
+              { title: 'Upcoming Activities', value: tripData ? tripData.days.reduce((acc, day) => acc + day.activities.length, 0) : '12', icon: <Activity />, colorClass: 'icon-pink' }
             ].map((stat, idx) => (
               <motion.div 
                 className="stat-card" 
@@ -267,28 +333,56 @@ function DashboardPage() {
             
             <div className="timeline-line" />
             
-            {[
-              { time: 'Day 1 • 09:00 AM', title: 'Arrival at HNL Airport', desc: 'Pick up rental car and drive to Airbnb in Waikiki.' },
-              { time: 'Day 1 • 02:00 PM', title: 'Beach Afternoon', desc: 'Relaxing at Waikiki beach, surfing lessons.' },
-              { time: 'Day 1 • 07:30 PM', title: 'Welcome Dinner', desc: 'Reservation at Duke\'s Waikiki for the group.' }
-            ].map((item, idx) => (
-              <motion.div 
-                className="timeline-item" 
-                key={idx}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 1 + (idx * 0.2) }}
-              >
-                <div className="timeline-icon">
-                  <Clock size={18} />
-                </div>
-                <div className="timeline-content">
-                  <div className="timeline-time">{item.time}</div>
-                  <h4 className="timeline-title">{item.title}</h4>
-                  <p className="timeline-desc">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
+            {isGeneratingTimeline ? (
+              <div style={{ textAlign: 'center', padding: '3rem 0', color: '#64748b' }}>
+                <Compass size={36} className="spin" style={{ color: '#0ea5e9', marginBottom: '1rem', animation: 'spin 2s linear infinite' }} />
+                <p style={{ margin: 0, fontWeight: 600 }}>Curating AI Timeline...</p>
+              </div>
+            ) : tripData ? (
+              tripData.days.flatMap((day, dIdx) => 
+                day.activities.map((act, aIdx) => (
+                  <motion.div 
+                    className="timeline-item" 
+                    key={`${dIdx}-${aIdx}`}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 1 + ((dIdx * 3 + aIdx) * 0.1) }}
+                  >
+                    <div className="timeline-icon">
+                      <Clock size={18} />
+                    </div>
+                    <div className="timeline-content">
+                      <div className="timeline-time">{day.title.split(':')[0]} • {act.time}</div>
+                      <h4 className="timeline-title">{act.title}</h4>
+                      <p className="timeline-desc">{act.desc}</p>
+                    </div>
+                  </motion.div>
+                ))
+              )
+            ) : (
+              [
+                { time: 'Day 1 • 09:00 AM', title: 'Arrival at HNL Airport', desc: 'Pick up rental car and drive to Airbnb in Waikiki.' },
+                { time: 'Day 1 • 02:00 PM', title: 'Beach Afternoon', desc: 'Relaxing at Waikiki beach, surfing lessons.' },
+                { time: 'Day 1 • 07:30 PM', title: 'Welcome Dinner', desc: 'Reservation at Duke\'s Waikiki for the group.' }
+              ].map((item, idx) => (
+                <motion.div 
+                  className="timeline-item" 
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 1 + (idx * 0.2) }}
+                >
+                  <div className="timeline-icon">
+                    <Clock size={18} />
+                  </div>
+                  <div className="timeline-content">
+                    <div className="timeline-time">{item.time}</div>
+                    <h4 className="timeline-title">{item.title}</h4>
+                    <p className="timeline-desc">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))
+            )}
           </motion.section>
 
         </div>
@@ -311,7 +405,7 @@ function DashboardPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={expenseData}
+                    data={tripData?.budget?.breakdown || expenseData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -320,18 +414,19 @@ function DashboardPage() {
                     dataKey="value"
                     stroke="none"
                   >
-                    {expenseData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    {(tripData?.budget?.breakdown || expenseData).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={['#38BDF8', '#7C3AED', '#4FD1C5', '#EC4899'][index % 4]} />
                     ))}
                   </Pie>
                   <Tooltip 
                     contentStyle={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', color: '#0f172a', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}
                     itemStyle={{ color: '#0f172a' }}
+                    formatter={(value) => `₹${value.toLocaleString()}`}
                   />
                 </PieChart>
               </ResponsiveContainer>
               <div className="chart-center-text">
-                <h3>$1,050</h3>
+                <h3>₹{tripData?.budget?.total ? tripData.budget.total.toLocaleString() : '25,000'}</h3>
                 <p>Spent Total</p>
               </div>
             </div>
@@ -388,7 +483,7 @@ function DashboardPage() {
             </div>
             
             <button className="btn-view-all">
-              View All Activity
+              {t('viewAllActivity')}
             </button>
           </motion.section>
 

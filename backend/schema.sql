@@ -1,0 +1,49 @@
+-- 1. Users Table
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Trips Table
+CREATE TABLE trips (
+  id SERIAL PRIMARY KEY,
+  owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  destination VARCHAR(255) NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Stops Table
+CREATE TABLE stops (
+  id SERIAL PRIMARY KEY,
+  trip_id INTEGER REFERENCES trips(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  location_lat DECIMAL(10, 8),
+  location_lng DECIMAL(11, 8),
+  arrival_time TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Activities Table
+CREATE TABLE activities (
+  id SERIAL PRIMARY KEY,
+  stop_id INTEGER REFERENCES stops(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  cost DECIMAL(10, 2) DEFAULT 0.00,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. Expenses Table
+CREATE TABLE expenses (
+  id SERIAL PRIMARY KEY,
+  trip_id INTEGER REFERENCES trips(id) ON DELETE CASCADE,
+  paid_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  description VARCHAR(255) NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  date DATE DEFAULT CURRENT_DATE
+);

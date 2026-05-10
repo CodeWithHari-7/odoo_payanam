@@ -171,3 +171,69 @@
   color: #0284c7;
   background: #f0f9ff;
 }
+
+/* History Search UI */
+.history-search-wrapper {
+  max-width: 1200px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.history-search-box {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  max-width: 500px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  transition: all 0.3s ease;
+}
+
+.history-search-box:focus-within {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+.search-icon-h {
+  color: #94a3b8;
+  margin-right: 0.8rem;
+  flex-shrink: 0;
+}
+
+.history-search-box:focus-within .search-icon-h {
+  color: #0284c7;
+}
+
+.history-search-input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-size: 1rem;
+  color: #0f172a;
+  outline: none;
+  font-family: 'Outfit', sans-serif;
+}
+
+.history-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.no-search-results {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+.no-search-results h4 {
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+  color: #0f172a;
+}

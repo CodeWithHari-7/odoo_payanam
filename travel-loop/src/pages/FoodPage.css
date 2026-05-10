@@ -1,0 +1,333 @@
+.food-page-container {
+  min-height: 100vh;
+  background-color: #fdfaf8;
+  font-family: 'Outfit', sans-serif;
+  padding-bottom: 5rem;
+}
+
+/* HERO SECTION */
+.food-hero {
+  position: relative;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 5%;
+  overflow: hidden;
+}
+
+.food-hero-bg {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&q=80&w=2000');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.food-hero-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(249, 115, 22, 0.3) 100%);
+  z-index: 1;
+}
+
+.food-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+  max-width: 800px;
+}
+
+.food-hero-content h1 {
+  color: white;
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  letter-spacing: -1px;
+}
+
+.food-hero-content p {
+  color: #fff7ed;
+  font-size: 1.3rem;
+  margin: 0 0 2.5rem 0;
+}
+
+/* SEARCH CARD */
+.food-search-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  border-radius: 32px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+
+.food-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+  border-radius: 50px;
+  border: 1px solid #fed7aa;
+}
+
+.food-search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  color: #0f172a;
+  background: transparent;
+  font-family: inherit;
+}
+
+.btn-search-food {
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-search-food:hover {
+  background: #ea580c;
+  transform: scale(1.05);
+}
+
+.search-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.search-divider::before,
+.search-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.search-divider span {
+  padding: 0 1rem;
+}
+
+.btn-food-near-me {
+  width: 100%;
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+}
+
+.btn-food-near-me:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+}
+
+.food-error {
+  margin-top: 1.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 1rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* RESULTS SECTION */
+.food-results {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 5%;
+}
+
+.food-loading {
+  text-align: center;
+  color: #64748b;
+  padding: 4rem 0;
+}
+
+.food-loading .spin {
+  color: #f97316;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.results-header h2 {
+  font-size: 2.2rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.results-count {
+  background: #fff7ed;
+  color: #ea580c;
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.5rem;
+}
+
+.food-card {
+  background: white;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(249, 115, 22, 0.05);
+  border: 1px solid rgba(249, 115, 22, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column;
+}
+
+.food-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 25px 60px rgba(249, 115, 22, 0.12);
+  border-color: #f97316;
+}
+
+.food-img-wrapper {
+  position: relative;
+  height: 240px;
+}
+
+.food-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.food-price-badge {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  color: #f97316;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.food-card-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.food-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.food-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.cuisine-type {
+  color: #f97316;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.food-card-body h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.6rem;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.food-card-body p {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+  flex: 1;
+}
+
+.food-specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.spec-badge {
+  background: #fff7ed;
+  color: #ea580c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-view-menu {
+  width: 100%;
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-view-menu:hover {
+  background: #f97316;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}

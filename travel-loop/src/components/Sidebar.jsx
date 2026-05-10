@@ -1,9 +1,23 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { Compass, Map, User, LogOut, Settings, Clock } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Compass, Map, User, LogOut, Settings, Clock, MessageSquare, Building, Utensils } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { supabase } from '../supabaseClient';
 import './Sidebar.css';
 
 function Sidebar() {
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error.message);
+    }
+  };
+
   return (
     <aside className="sidebar-nav">
       <div className="sidebar-logo">
@@ -14,30 +28,42 @@ function Sidebar() {
       <div className="sidebar-menu">
         <NavLink to="/dashboard" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
           <Compass size={20} />
-          <span>Dashboard</span>
+          <span>{t('navDashboard')}</span>
         </NavLink>
         <NavLink to="/trips" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
           <Map size={20} />
-          <span>My Trips</span>
+          <span>{t('navMyTrips')}</span>
+        </NavLink>
+        <NavLink to="/hotels" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <Building size={20} />
+          <span>Hotels</span>
+        </NavLink>
+        <NavLink to="/food" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <Utensils size={20} />
+          <span>Food</span>
         </NavLink>
         <NavLink to="/profile" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
           <User size={20} />
-          <span>Profile</span>
+          <span>{t('navProfile')}</span>
         </NavLink>
         <NavLink to="/history" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
           <Clock size={20} />
-          <span>History</span>
+          <span>{t('navHistory')}</span>
+        </NavLink>
+        <NavLink to="/ai-chat" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <MessageSquare size={20} />
+          <span>{t('navAIChat')}</span>
         </NavLink>
       </div>
 
       <div className="sidebar-footer">
-        <button className="nav-item">
+        <NavLink to="/settings" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
           <Settings size={20} />
-          <span>Settings</span>
-        </button>
-        <button className="nav-item logout">
+          <span>{t('navSettings')}</span>
+        </NavLink>
+        <button className="nav-item logout" onClick={handleLogout}>
           <LogOut size={20} />
-          <span>Log Out</span>
+          <span>{t('navLogOut')}</span>
         </button>
       </div>
     </aside>

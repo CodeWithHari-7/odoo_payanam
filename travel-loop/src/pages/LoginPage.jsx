@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import './LoginPage.css';
 
 function LoginPage() {
@@ -18,20 +19,19 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || data.error || 'Failed to login');
+      if (authError) {
+        throw new Error(authError.message);
       }
 
-      localStorage.setItem('token', data.token);
-      navigate('/trips'); // Redirect to trips per user request
+      if (data.session) {
+        localStorage.setItem('token', data.session.access_token);
+        navigate('/trips'); // Redirect to trips upon successful login
+      }
       
     } catch (err) {
       setError(err.message);
