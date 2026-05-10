@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { 
@@ -40,6 +41,78 @@ const heroImages = [
 
 function DashboardPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [query, setQuery] = useState('');
+  const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState(() => {
+    try {
+      const savedLoc = localStorage.getItem('savedTripLocation');
+      if (savedLoc) {
+        const locObj = JSON.parse(savedLoc);
+        if (locObj.country) {
+          const name = locObj.area || locObj.state || locObj.country;
+          return { name, fullName: `${locObj.area ? locObj.area+', ' : ''}${locObj.country}` };
+        }
+      }
+    } catch(e) {}
+    return null;
+  });
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    if (query.length < 2) {
+      setPlaces([]);
+      setLoading(false);
+      return;
+    }
+    
+    const fetchPlaces = async () => {
+      setLoading(true);
+      try {
+        const token = import.meta.env.VITE_MAPBOX_TOKEN;
+        if (!token) {
+          console.warn('Mapbox token is missing in .env');
+          return;
+        }
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&types=place,region,country,locality`;
+        const response = await fetch(url);
+        const data = await response.json();
+        setPlaces(data.features || []);
+      } catch (error) {
+        console.error("Mapbox API Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timer = setTimeout(fetchPlaces, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const handleSelectPlace = (place) => {
+    const newPlace = {
+      name: place.text,
+      fullName: place.place_name,
+      lng: place.center[0],
+      lat: place.center[1],
+      timestamp: new Date().toISOString()
+    };
+    
+    setSelectedPlace(newPlace);
+    setQuery(place.text);
+    setShowDropdown(false);
+    
+    // Save to search history
+    try {
+      const existingHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+      if (existingHistory.length === 0 || existingHistory[0].fullName !== newPlace.fullName) {
+        const updatedHistory = [newPlace, ...existingHistory].slice(0, 50); // Keep last 50
+        localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+      }
+    } catch(e) {
+      console.error("Error saving history", e);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -73,12 +146,52 @@ function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1>Oahu Expedition 2026</h1>
+            <h1>{selectedPlace ? `${selectedPlace.name} Expedition 2026` : 'Oahu Expedition 2026'}</h1>
             <div className="hero-meta">
-              <div className="hero-meta-item">
-                <MapPin size={18} />
-                <span>Honolulu, Hawaii</span>
+              
+              <div className="destination-search-container">
+                <div className="search-input-wrapper">
+                  <MapPin className="search-icon" size={18} />
+                  <input 
+                    type="text"
+                    placeholder="Search Area / City..."
+                    value={query}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      setShowDropdown(true);
+                    }}
+                    onFocus={() => setShowDropdown(true)}
+                    className="destination-input"
+                  />
+                  {loading && <div className="search-spinner"><Compass size={16} className="spin" /></div>}
+                </div>
+
+                <AnimatePresence>
+                  {showDropdown && places.length > 0 && (
+                    <motion.div 
+                      className="autocomplete-dropdown"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      {places.map(place => (
+                        <div 
+                          key={place.id} 
+                          className="dropdown-item"
+                          onClick={() => handleSelectPlace(place)}
+                        >
+                          <MapPin size={16} className="dropdown-icon" />
+                          <div className="dropdown-text">
+                            <span className="place-name">{place.text}</span>
+                            <span className="place-context">{place.place_name.replace(place.text + ', ', '')}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+
               <div className="hero-meta-item">
                 <Calendar size={18} />
                 <span>Oct 12 - Oct 20</span>
@@ -139,33 +252,7 @@ function DashboardPage() {
             ))}
           </section>
 
-          {/* 3. MAP SECTION */}
-          <motion.section 
-            className="map-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <div className="map-placeholder-bg" />
-            <div className="map-marker marker-1" />
-            <div className="map-marker marker-2" />
-            
-            <div className="map-route">
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path 
-                  d="M 30 60 Q 50 20 70 30" 
-                  fill="none" 
-                  strokeWidth="0.5" 
-                  className="route-line"
-                />
-              </svg>
-            </div>
 
-            <div className="map-card-overlay">
-              <h4>Current Route</h4>
-              <p>Waikiki Beach → Diamond Head</p>
-            </div>
-          </motion.section>
 
           {/* 4. ITINERARY TIMELINE */}
           <motion.section 

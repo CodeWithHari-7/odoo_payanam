@@ -1,0 +1,22 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: transparent; /* Let the pages define their own backgrounds */
+}
+
+.main-content-area {
+  flex: 1;
+  margin-left: 260px; /* Width of the Sidebar */
+  width: calc(100% - 260px);
+  min-height: 100vh;
+  position: relative;
+  /* Add smooth transition if we ever make it collapsible */
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Make sure inner absolute positioning doesn't escape */
+.main-content-area > div {
+  min-height: 100vh;
+}

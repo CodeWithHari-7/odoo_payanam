@@ -91,14 +91,14 @@
 
 /* LOCATION SETTER UI */
 .location-setter-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   padding: 2.5rem;
   border-radius: 24px;
-  max-width: 900px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 1000px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+  margin: 0 auto;
 }
 
 .location-setter-header {
@@ -111,17 +111,16 @@
 .location-setter-header h2 {
   font-size: 2rem;
   margin: 0;
-  color: #fff;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  color: #0f172a;
   display: flex;
   align-items: center;
   gap: 0.8rem;
 }
 
 .btn-current-location {
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.4);
-  color: #fff;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
   padding: 0.8rem 1.2rem;
   border-radius: 50px;
   display: flex;
@@ -133,14 +132,36 @@
 }
 
 .btn-current-location:hover {
-  background: #38BDF8;
-  border-color: #38BDF8;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  background: #e2e8f0;
 }
 
 .btn-current-location:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-select-dest {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #0284c7, #7C3AED);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+}
+
+.btn-select-dest:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
 }
 
 .location-inputs-wrapper {
@@ -161,31 +182,31 @@
 }
 
 .loc-input-group label {
-  color: #e2e8f0;
+  color: #475569;
   font-size: 0.95rem;
   font-weight: 600;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  margin-bottom: 0.4rem;
 }
 
 .loc-input-group input {
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(0,0,0,0.3);
-  color: #fff;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
   outline: none;
   font-size: 1.05rem;
   transition: all 0.3s;
 }
 
 .loc-input-group input::placeholder {
-  color: rgba(255,255,255,0.4);
+  color: #94a3b8;
 }
 
 .loc-input-group input:focus {
-  border-color: #38BDF8;
-  background: rgba(0,0,0,0.5);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  border-color: #0284c7;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
 }
 
 .loc-input-group input.error-border {

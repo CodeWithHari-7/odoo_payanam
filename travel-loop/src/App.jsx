@@ -6,6 +6,8 @@ import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import TripsPage from './pages/TripsPage';
+import HistoryPage from './pages/HistoryPage';
+import AppLayout from './components/AppLayout';
 
 function App() {
   return (
@@ -16,10 +18,11 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         
-        {/* Protected/Private Routes */}
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/trips" element={<TripsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        {/* Protected/Private Routes inside AppLayout */}
+        <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+        <Route path="/trips" element={<AppLayout><TripsPage /></AppLayout>} />
+        <Route path="/profile" element={<AppLayout><ProfilePage /></AppLayout>} />
+        <Route path="/history" element={<AppLayout><HistoryPage /></AppLayout>} />
       </Routes>
     </Router>
   );
